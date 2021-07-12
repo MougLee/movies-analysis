@@ -1,0 +1,27 @@
+version: "3.8"
+services:
+  spark-master:
+    image: spark-master:latest
+    ports:
+      - "4040:4040"
+      - "8080:8080"
+    volumes:
+       - ./apps:/opt/spark-apps
+       - ./data:/opt/spark-data
+    env_file:
+      - ./../.env
+  spark-worker:
+    image: spark-worker:latest
+    depends_on:
+      - spark-master
+    ports:
+      - 8081
+    environment:
+      - SPARK_WORKER_CORES=1
+      - SPARK_WORKER_MEMORY=2G
+      - SPARK_EXECUTOR_MEMORY=2G
+    env_file:
+      - ./../.env
+    volumes:
+       - ./apps:/opt/spark-apps
+       - ./data:/opt/spark-data
