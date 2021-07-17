@@ -1,8 +1,45 @@
 package dataGenerators
 
-import analyzer.dataProviders.TmdbActor
+import analyzer.dataProviders.{MovieDailyChange, TmdbActor}
 
 object TheMovieDatabaseDataGenerator {
+
+  val changes: Seq[String] = List(
+    """{"results": [{ "id": 791373, "adult": false }, { "id": 399566, "adult": false }, {"id": 460465, "adult": false}, {"id": 412656, "adult": false}, {"id": 615457, "adult": false}]}""",
+    """{"results": [{ "id": 791373, "adult": false }, { "id": 399566, "adult": false }, {"id": 460465, "adult": false}, {"id": 412656, "adult": false}, {"id": 615457, "adult": false}]}""",
+    """{"results": [{ "id": 791373, "adult": false }, { "id": 399566, "adult": false }, {"id": 460465, "adult": false}, {"id": 412656, "adult": false}, {"id": 615457, "adult": false}]}""",
+    """{"results": [{ "id": 412683, "adult": false }, { "id": 412685, "adult": false }, {"id": 75258, "adult": false}, {"id": 60308, "adult": false}]}""",
+  )
+
+  val movieDailyExports: Seq[MovieDailyChange] = List(
+    MovieDailyChange(791373, "Zack Snyder's Justice League", 1.1, "04_30_2021"),
+    MovieDailyChange(791373, "Zack Snyder's Justice League", 7.5, "04_12_2021"),
+    MovieDailyChange(791373, "Zack Snyder's Justice League", 9.9, "04_02_2021"),
+
+    MovieDailyChange(399566, "Godzilla vs. Kong", 1.2, "04_04_2021"),
+    MovieDailyChange(399566, "Godzilla vs. Kong", 7.2, "04_14_2021"),
+    MovieDailyChange(399566, "Godzilla vs. Kong", 9.9, "04_24_2021"),
+
+    MovieDailyChange(460465, "Mortal Kombat", 1.3, "04_18_2021"),
+    MovieDailyChange(460465, "Mortal Kombat", 5.3, "04_23_2021"),
+    MovieDailyChange(460465, "Mortal Kombat", 9.8, "04_28_2021"),
+
+    MovieDailyChange(412656, "Chaos Walking", 1.4, "04_11_2021"),
+    MovieDailyChange(412656, "Chaos Walking", 6.4, "04_12_2021"),
+    MovieDailyChange(412656, "Chaos Walking", 9.7, "04_13_2021"),
+
+    MovieDailyChange(615457, "Nobody", 1.4, "04_06_2021"),
+    MovieDailyChange(615457, "Nobody", 2.4, "04_16_2021"),
+    MovieDailyChange(615457, "Nobody", 9.6, "04_26_2021"),
+
+    MovieDailyChange(412683, "Movie with minor popularity change", 1.5, "04_11_2021"),
+    MovieDailyChange(412683, "Movie with minor popularity change", 1.6, "04_15_2021"),
+    MovieDailyChange(412683, "Movie with minor popularity change", 1.7, "04_19_2021"),
+
+    MovieDailyChange(412685, "Movie without popularity change", 8.3,"04_05_2021"),
+    MovieDailyChange(412685, "Movie without popularity change", 8.3,"04_15_2021"),
+    MovieDailyChange(412685, "Movie without popularity change", 8.3,"04_25_2021"),
+  )
 
   val actors: Seq[TmdbActor] = List(
     TmdbActor("nm0000198", 64, 9.845),

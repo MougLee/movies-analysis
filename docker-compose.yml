@@ -6,6 +6,8 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: analyzer
+    env_file:
+      - .env
     volumes:
       - ./:/app
       - ./spark-cluster/data:/opt/spark-data

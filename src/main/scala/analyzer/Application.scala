@@ -10,7 +10,7 @@ import scala.concurrent.ExecutionContext
 
 object Application extends App {
 
-  // TODO: add more tests, add user to docker
+  // TODO: add user to docker
   implicit val ec: ExecutionContext = ExecutionContext.Implicits.global
 
   val spark = SparkSession.builder()

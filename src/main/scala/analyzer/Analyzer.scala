@@ -36,7 +36,7 @@ class Analyzer(spark: SparkSession, tmdbDataProvider: TheMovieDatabaseDataProvid
     val top5 = dailyExports.join(mostChanged, "id")
     val maxResults = top5.as("r1").join(top5.as("r2"), $"r1.popularity" === $"r2.max_pop" and $"r1.id" === $"r2.id", "left_semi")
       .withColumnRenamed("date", "max_pop_date")
-      .select("id", "original_title", "popularity_diff", "popularity", "max_pop", "max_pop_date")
+      .select("id", "original_title", "popularity_diff", "max_pop", "max_pop_date")
 
     val minResults = top5.as("r1").join(top5.as("r2"), $"r1.popularity" === $"r2.min_pop" and $"r1.id" === $"r2.id", "left_semi")
       .withColumnRenamed("date", "min_pop_date")
@@ -48,11 +48,11 @@ class Analyzer(spark: SparkSession, tmdbDataProvider: TheMovieDatabaseDataProvid
 
   // From the top 10 movies available on IMDb with more than 400k votes, select the actor with the highest popularity rating.
   def mostPopularActor(top: Int = 10): Dataset[MostPopularActorAndMovie] = {
-    val imdbTitles = imdbDataProvider.fetchTitles().filter(_.titleType == "movie")
+    val imdbTitles = imdbDataProvider.fetchTitles.filter(_.titleType == "movie")
 
-    val imdbRatings = imdbDataProvider.fetchRatings().filter(_.numVotes.toLong > 400000)
-    val titlePrincipals = imdbDataProvider.fetchPrincipals()
-    val actors = imdbDataProvider.fetchActors()
+    val imdbRatings = imdbDataProvider.fetchRatings.filter(_.numVotes.toLong > 400000)
+    val titlePrincipals = imdbDataProvider.fetchPrincipals
+    val actors = imdbDataProvider.fetchActors
 
     val imdbTitlesWithRating = imdbTitles.join(imdbRatings, "tconst")
       .orderBy(col("averageRating").cast(IntegerType).desc)
@@ -87,6 +87,6 @@ class Analyzer(spark: SparkSession, tmdbDataProvider: TheMovieDatabaseDataProvid
 
 case class ImdbTitlesWithRating(tconst: String, averageRating: String, numVotes: String)
 
-case class MoviePopularityChange(id: Long, original_title: String, popularity_diff: Double, popularity: Double, max_pop: Double, max_pop_date: String, min_pop: Double, min_pop_date: String)
+case class MoviePopularityChange(id: Long, original_title: String, popularity_diff: Double, max_pop: Double, max_pop_date: String, min_pop: Double, min_pop_date: String)
 
 case class MostPopularActorAndMovie(actor_id: String, actor_name: String, actor_popularity: String, movie_title: String, movie_rating: String)

@@ -7,13 +7,13 @@ class ImdbDataProvider(spark: SparkSession, bucket: String = "s3a://htec.intervi
 
   import spark.implicits._
 
-  def fetchTitles(): Dataset[ImdbTitles] = fetchImdbData("title.basics.tsv").as[ImdbTitles]
+  def fetchTitles: Dataset[ImdbTitles] = fetchImdbData("title.basics.tsv").as[ImdbTitles]
 
-  def fetchRatings(): Dataset[ImdbRating] = fetchImdbData("title.ratings.tsv").as[ImdbRating]
+  def fetchRatings: Dataset[ImdbRating] = fetchImdbData("title.ratings.tsv").as[ImdbRating]
 
-  def fetchPrincipals(): Dataset[TitlePrincipal] = fetchImdbData("title.principals.tsv").as[TitlePrincipal]
+  def fetchPrincipals: Dataset[TitlePrincipal] = fetchImdbData("title.principals.tsv").as[TitlePrincipal]
 
-  def fetchActors(): Dataset[Actor] = {
+  def fetchActors: Dataset[Actor] = {
     fetchImdbData("name.basics.tsv")
       .select(
         col("nconst"),
