@@ -24,26 +24,19 @@ class Analyzer(spark: SparkSession, tmdbDataProvider: TheMovieDatabaseDataProvid
     val dailyExports = tmdbDataProvider.fetchDailyExportsForMonth(YearMonth.of(2021, 4))
     val changedMovies = dailyExports.join(changedMovieIds, "id") // only movies that were changed are interesting -> reduce number of items to
 
-    val mostChanged = changedMovies.groupBy("id")
-      .agg(
-        min("popularity").as("min_pop"),
-        max("popularity").as("max_pop"),
-      )
-      .withColumn("popularity_diff", col("max_pop") - col("min_pop"))
-      .orderBy(col("popularity_diff").desc)
-      .limit(top)
+    changedMovies.createOrReplaceTempView("changedMovies")
 
-    val top5 = dailyExports.join(mostChanged, "id")
-    val maxResults = top5.as("r1").join(top5.as("r2"), $"r1.popularity" === $"r2.max_pop" and $"r1.id" === $"r2.id", "left_semi")
-      .withColumnRenamed("date", "max_pop_date")
-      .select("id", "original_title", "popularity_diff", "max_pop", "max_pop_date")
-
-    val minResults = top5.as("r1").join(top5.as("r2"), $"r1.popularity" === $"r2.min_pop" and $"r1.id" === $"r2.id", "left_semi")
-      .withColumnRenamed("date", "min_pop_date")
-      .withColumnRenamed("date", "min_pop_date")
-      .select("id", "min_pop", "min_pop_date")
-
-    maxResults.join(minResults, "id").as[MoviePopularityChange]
+    spark.sql(
+      """
+        |SELECT t1.id AS id, original_title, max_pop, max_pop_date, min_pop, min_pop_date, max_pop - min_pop AS popularity_diff
+        |FROM
+        | (SELECT id, original_title, popularity AS min_pop, date as min_pop_date FROM changedMovies WHERE (id, popularity) IN (SELECT id, MIN(popularity) FROM changedMovies GROUP BY id)) t1
+        |JOIN
+        | (SELECT id, popularity AS max_pop, date as max_pop_date FROM changedMovies WHERE (id, popularity) IN (SELECT id, MAX(popularity) FROM changedMovies GROUP BY id)) t2
+        | ON  t1.id = t2.id
+        |ORDER BY popularity_diff DESC LIMIT 5
+        |""".stripMargin
+    ).as[MoviePopularityChange]
   }
 
   // From the top 10 movies available on IMDb with more than 400k votes, select the actor with the highest popularity rating.
